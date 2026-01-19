@@ -1,0 +1,184 @@
+ai-workflow-automation/
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   ├── config.py
+│   │   ├── database.py
+│   │   ├── dependencies.py
+│   │   ├── api/
+│   │   │   ├── __init__.py
+│   │   │   ├── v1/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── workflows.py
+│   │   │   │   ├── executions.py
+│   │   │   │   ├── ai.py
+│   │   │   │   ├── auth.py
+│   │   │   │   ├── integrations.py
+│   │   │   │   └── users.py
+│   │   ├── models/
+│   │   │   ├── __init__.py
+│   │   │   ├── workflow.py
+│   │   │   ├── execution.py
+│   │   │   ├── user.py
+│   │   │   └── integration.py
+│   │   ├── schemas/
+│   │   │   ├── __init__.py
+│   │   │   ├── workflow.py
+│   │   │   ├── execution.py
+│   │   │   ├── user.py
+│   │   │   └── ai.py
+│   │   ├── services/
+│   │   │   ├── __init__.py
+│   │   │   ├── workflow_service.py
+│   │   │   ├── execution_service.py
+│   │   │   ├── ai_service.py
+│   │   │   ├── integration_service.py
+│   │   │   └── auth_service.py
+│   │   ├── ai/
+│   │   │   ├── __init__.py
+│   │   │   ├── parser.py
+│   │   │   ├── validator.py
+│   │   │   ├── optimizer.py
+│   │   │   └── recovery.py
+│   │   ├── workers/
+│   │   │   ├── __init__.py
+│   │   │   ├── celery_app.py
+│   │   │   ├── tasks.py
+│   │   │   └── scheduler.py
+│   │   ├── integrations/
+│   │   │   ├── __init__.py
+│   │   │   ├── base.py
+│   │   │   ├── slack.py
+│   │   │   ├── email.py
+│   │   │   ├── database.py
+│   │   │   └── webhook.py
+│   │   └── utils/
+│   │       ├── __init__.py
+│   │       ├── logger.py
+│   │       ├── security.py
+│   │       └── validators.py
+│   ├── alembic/
+│   │   ├── versions/
+│   │   ├── env.py
+│   │   └── script.py.mako
+│   ├── tests/
+│   │   ├── __init__.py
+│   │   ├── conftest.py
+│   │   ├── test_workflows.py
+│   │   ├── test_ai.py
+│   │   └── test_integrations.py
+│   ├── requirements.txt
+│   ├── requirements-dev.txt
+│   ├── Dockerfile
+│   ├── alembic.ini
+│   └── pytest.ini
+│
+├── frontend/
+│   ├── public/
+│   │   └── index.html
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── WorkflowBuilder/
+│   │   │   │   ├── WorkflowCanvas.tsx
+│   │   │   │   ├── NodeTypes.tsx
+│   │   │   │   ├── EdgeTypes.tsx
+│   │   │   │   └── Sidebar.tsx
+│   │   │   ├── AIChat/
+│   │   │   │   ├── ChatInterface.tsx
+│   │   │   │   └── WorkflowPreview.tsx
+│   │   │   ├── Dashboard/
+│   │   │   │   ├── WorkflowList.tsx
+│   │   │   │   ├── ExecutionHistory.tsx
+│   │   │   │   └── Analytics.tsx
+│   │   │   └── common/
+│   │   │       ├── Button.tsx
+│   │   │       ├── Input.tsx
+│   │   │       └── Modal.tsx
+│   │   ├── pages/
+│   │   │   ├── Home.tsx
+│   │   │   ├── WorkflowEditor.tsx
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── Integrations.tsx
+│   │   │   └── Settings.tsx
+│   │   ├── hooks/
+│   │   │   ├── useWorkflows.ts
+│   │   │   ├── useExecutions.ts
+│   │   │   └── useAuth.ts
+│   │   ├── services/
+│   │   │   ├── api.ts
+│   │   │   ├── auth.ts
+│   │   │   └── websocket.ts
+│   │   ├── store/
+│   │   │   ├── workflowStore.ts
+│   │   │   ├── authStore.ts
+│   │   │   └── uiStore.ts
+│   │   ├── types/
+│   │   │   ├── workflow.ts
+│   │   │   ├── execution.ts
+│   │   │   └── user.ts
+│   │   ├── utils/
+│   │   │   ├── validators.ts
+│   │   │   └── formatters.ts
+│   │   ├── App.tsx
+│   │   ├── main.tsx
+│   │   └── index.css
+│   ├── package.json
+│   ├── tsconfig.json
+│   ├── vite.config.ts
+│   ├── tailwind.config.js
+│   └── Dockerfile
+│
+├── workflow-engine/
+│   ├── src/
+│   │   ├── engine/
+│   │   │   ├── executor.ts
+│   │   │   ├── scheduler.ts
+│   │   │   └── monitor.ts
+│   │   ├── triggers/
+│   │   │   ├── webhook.ts
+│   │   │   ├── schedule.ts
+│   │   │   └── event.ts
+│   │   ├── actions/
+│   │   │   ├── api.ts
+│   │   │   ├── database.ts
+│   │   │   ├── email.ts
+│   │   │   └── transform.ts
+│   │   ├── recovery/
+│   │   │   ├── retry.ts
+│   │   │   └── fallback.ts
+│   │   └── index.ts
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── Dockerfile
+│
+├── docker/
+│   ├── nginx/
+│   │   ├── nginx.conf
+│   │   └── Dockerfile
+│   └── postgres/
+│       └── init.sql
+│
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       ├── cd.yml
+│       └── tests.yml
+│
+├── docs/
+│   ├── API.md
+│   ├── ARCHITECTURE.md
+│   ├── DEPLOYMENT.md
+│   └── CONTRIBUTING.md
+│
+├── scripts/
+│   ├── setup.sh
+│   ├── migrate.sh
+│   └── seed.sh
+│
+├── docker-compose.yml
+├── docker-compose.prod.yml
+├── .env.example
+├── .gitignore
+├── LICENSE
+└── README.md

@@ -1,0 +1,185 @@
+frontend/src/components/WorkflowBuilder/WorkflowCanvas.tsx
+import React, { useCallback, useState } from 'react';
+import ReactFlow, {
+  Node,
+  Edge,
+  Controls,
+  Background,
+  MiniMap,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  Connection,
+} from 'reactflow';
+import 'reactflow/dist/style.css';
+
+import { WorkflowNode } from './NodeTypes';
+
+interface WorkflowCanvasProps {
+  workflowDefinition: any;
+  onUpdate: (definition: any) => void;
+}
+
+export const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
+  workflowDefinition,
+  onUpdate,
+}) => {
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
+  // Convert workflow definition to nodes and edges
+  React.useEffect(() => {
+    if (workflowDefinition?.actions) {
+      const newNodes: Node[] = workflowDefinition.actions.map((action: any, index: number) => ({
+        id: action.id,
+        type: 'workflowNode',
+        position: { x: 100, y: 100 + index * 150 },
+        data: {
+          label: action.name,
+          type: action.type,
+          config: action.config,
+        },
+      }));
+
+      const newEdges: Edge[] = [];
+      workflowDefinition.actions.forEach((action: any) => {
+        if (action.next) {
+          action.next.forEach((nextId: string) => {
+            newEdges.push({
+              id: `${action.id}-${nextId}`,
+              source: action.id,
+              target: nextId,
+              animated: true,
+            });
+          });
+        }
+      });
+
+      setNodes(newNodes);
+      setEdges(newEdges);
+    }
+  }, [workflowDefinition]);
+
+  const onConnect = useCallback(
+    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
+    [setEdges]
+  );
+
+  return (
+    <div className="w-full h-screen bg-gray-50">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        nodeTypes={{ workflowNode: WorkflowNode }}
+        fitView
+      >
+        <Controls />
+        <MiniMap />
+        <Background variant="dots" gap={12} size={1} />
+      </ReactFlow>
+    </div>
+  );
+};
+
+
+frontend/src/components/AIChat/ChatInterface.tsx
+import React, { useState } from 'react';
+import { api } from '../../services/api';
+
+export const ChatInterface: React.FC = () => {
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [workflow, setWorkflow] = useState(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+
+    setLoading(true);
+    try {
+      const response = await api.post('/api/v1/ai/parse', { text: input });
+      setWorkflow(response.data.workflow);
+    } catch (error) {
+      console.error('Failed to parse workflow:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto p-6">
+        {workflow && (
+          <div className="bg-white rounded-lg shadow p-4 mb-4">
+            <h3 className="font-semibold mb-2">Generated Workflow</h3>
+            <pre className="text-sm bg-gray-100 p-3 rounded overflow-x-auto">
+              {JSON.stringify(workflow, null, 2)}
+            </pre>
+          </div>
+        )}
+      </div>
+
+      <form onSubmit={handleSubmit} className="p-6 border-t">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Describe your workflow in plain English..."
+            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={loading}
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loading ? 'Processing...' : 'Create'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+
+frontend/src/services/api.ts
+import axios from 'axios';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+export const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Request interceptor for adding auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor for handling errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+
